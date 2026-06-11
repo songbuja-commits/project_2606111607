@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP FORGE - AI-Driven IP Pipeline</title>
+    
+    <!-- Pretendard Font -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#0B0B0F',
+                        primary: '#00F0FF',
+                        secondary: '#9D00FF',
+                        textMain: '#F5F5F7',
+                        card: '#12121A',
+                        grayMid: '#8A8A93'
+                    },
+                    fontFamily: {
+                        sans: ['Pretendard', 'sans-serif'],
+                    },
+                    fontSize: {
+                        body: '16px',
+                        heading: '64px'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #0B0B0F;
+            color: #F5F5F7;
+            font-family: 'Pretendard', sans-serif;
+            font-size: 16px;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Typography & Color Utilities */
+        .gradient-text {
+            background: linear-gradient(90deg, #00F0FF, #9D00FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+        }
+
+        /* Buttons */
+        .btn-header {
+            border: 1px solid #00F0FF;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+            color: #00F0FF;
+            transition: all 0.3s ease;
+        }
+        .btn-header:hover {
+            background-color: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #00F0FF, #00B3FF);
+            color: #0B0B0F;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            border: 1px solid #8A8A93;
+            color: #F5F5F7;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #F5F5F7;
+        }
+
+        .btn-cta {
+            background: linear-gradient(90deg, #00F0FF, #9D00FF);
+            color: #F5F5F7;
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(157, 0, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .btn-cta:hover {
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* UI Elements */
+        .glass-header {
+            background: rgba(11, 11, 15, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1639322537228-f710d846310a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: -1;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+        }
+
+        /* Cards & Interactions */
+        .feature-card {
+            background: #12121A;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .target-card {
+            background: #12121A;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: all 0.4s ease;
+            z-index: 1;
+        }
+        .target-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(90deg, #9D00FF, #00F0FF);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+        .target-card:hover {
+            transform: translateY(-5px);
+            background: #181824;
+        }
+        .target-card:hover::before {
+            opacity: 1;
+            box-shadow: 0 0 20px rgba(157, 0, 255, 0.4);
+        }
+
+        /* Animations */
+        .typing-container {
+            border-right: 2px solid #00F0FF;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 4s steps(40, end) infinite alternate, blink-caret .75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #00F0FF; }
+        }
+
+        .cta-bg {
+            background: radial-gradient(circle at center, rgba(157,0,255,0.15) 0%, rgba(11,11,15,1) 70%);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-primary selection:text-background relative">
+
+    <!-- 1. HEADER -->
+    <header class="fixed top-0 w-full z-50 glass-header">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-2 cursor-pointer">
+                <span class="text-2xl font-black tracking-tighter">IP FORGE</span>
+                <span class="hidden md:inline-block text-xs text-primary font-light border border-primary/30 px-2 py-0.5 rounded-full">AI-Driven IP Pipeline</span>
+            </div>
+
+            <!-- GNB (Desktop) -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-grayMid">
+                <a href="#feature1" class="hover:text-primary transition-colors">AI 초안 엔진</a>
+                <a href="#feature2" class="hover:text-primary transition-colors">변리사 매칭</a>
+                <a href="#feature3" class="hover:text-primary transition-colors">IP 거래 & 펀딩</a>
+                <a href="#" class="hover:text-primary transition-colors">고객 지원</a>
+            </nav>
+
+            <!-- CTA -->
+            <div class="hidden md:block">
+                <button class="btn-header px-6 py-2 rounded-full text-sm font-semibold tracking-wide">
+                    무료 초안 진단
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="md:hidden">
+                <button id="mobileMenuBtn" class="text-textMain focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobileMenu" class="hidden md:hidden bg-background border-t border-white/5 absolute w-full">
+            <div class="flex flex-col px-6 py-4 gap-4 text-sm">
+                <a href="#feature1" class="text-textMain">AI 초안 엔진</a>
+                <a href="#feature2" class="text-textMain">변리사 매칭</a>
+                <a href="#feature3" class="text-textMain">IP 거래 & 펀딩</a>
+                <a href="#" class="text-textMain">고객 지원</a>
+                <button class="btn-header px-4 py-2 mt-2 rounded-full text-sm font-semibold w-full">무료 초안 진단</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. HERO SECTION -->
+    <section class="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        <div class="hero-bg"></div>
+        <div class="max-w-7xl mx-auto px-6 w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center z-10">
+            <!-- Text Content -->
+            <div class="flex flex-col gap-6">
+                <h1 class="text-5xl md:text-[64px] font-black leading-[1.1] tracking-tight">
+                    아이디어에서 권리화,<br>그리고 현금화까지.<br>
+                    <span class="gradient-text">단 하나의 파이프라인으로.</span>
+                </h1>
+                <p class="text-grayMid text-lg leading-relaxed max-w-xl">
+                    말로 설명하던 거친 아이디어가 단 5분 만에 특허 청구항 초안으로 구현됩니다.<br>
+                    검증된 전문 변리사의 정밀 검토를 거쳐, 글로벌 기업 매칭과 크라우드 펀딩까지.<br>
+                    <strong class="text-textMain font-semibold">IP FORGE</strong>는 당신의 아이디어를 시장을 지배하는 디지털 자산으로 진화시킵니다.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 mt-4">
+                    <button class="btn-primary px-8 py-4 rounded-lg text-lg flex items-center justify-center gap-2">
+                        AI로 5분 만에 IP 초안 만들기 ⚡
+                    </button>
+                    <button class="btn-secondary px-8 py-4 rounded-lg text-lg flex items-center justify-center gap-2">
+                        1분 서비스 가이드 보기 ▶
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Preview UI -->
+            <div class="relative w-full h-[500px] rounded-2xl bg-[#0f0f16] border border-white/10 shadow-2xl overflow-hidden flex flex-col">
+                <div class="h-10 bg-[#1a1a24] border-b border-white/5 flex items-center px-4 gap-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="ml-4 text-xs text-grayMid font-mono">IP_Forge_Drafting_Engine.exe</span>
+                </div>
+                <div class="p-6 font-mono text-sm text-grayMid relative flex-1">
+                    <div class="text-primary mb-2">> Input Idea: "차량용 스마트 안전 센서"</div>
+                    <div class="mb-4">> Analyzing technical specs... [Done]</div>
+                    <div class="text-textMain mb-2">【 청 구 항 】</div>
+                    <div class="pl-4 border-l-2 border-white/10">
+                        <div class="typing-container w-max">
+                            청구항 1. 차량의 주행 데이터를 수집하는 센서부;
+                        </div>
+                        <div class="opacity-50 mt-2">상기 센서부의 데이터를 기반으로 위험 상황을 예측하는 제어부;</div>
+                        <div class="opacity-50 mt-1">상기 제어부의 신호에 따라 안전 장치를 구동하는 구동부; 를 포함하는...</div>
+                    </div>
+                    <div class="absolute bottom-6 right-6 px-3 py-1 bg-primary/20 text-primary border border-primary/30 rounded text-xs animate-pulse">
+                        Rendering in Real-time...
+                    </div>
+                </div>
+                <!-- Overlay Image for UI richness -->
+                <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center opacity-10 mix-blend-screen pointer-events-none"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. FEATURE INTRODUCTIONS -->
+    <section class="py-24 bg-background">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col gap-32">
+
+            <!-- Feature 01 -->
+            <div id="feature1" class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="order-2 md:order-1">
+                    <span class="text-xs font-bold tracking-widest text-primary border border-primary/30 px-3 py-1 rounded-full mb-4 inline-block">[ TECH INFUSED DRAFTING ]</span>
+                    <h3 class="text-primary font-medium mt-2">AI 특허 명세서 엔진</h3>
+                    <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-6 leading-tight">“아이디어 구상을 단 5분 만에<br>정교한 청구항으로.”</h2>
+                    <p class="text-grayMid leading-relaxed mb-8">
+                        특허사무소 방문 전, 아이디어를 어떻게 설명할지 고민하며 시간을 낭비하지 마세요. 
+                        최첨단 특허 특화 AI 에이전트가 단 몇 줄의 설명만으로 <strong class="text-textMain">특허·실용신안 명세서 초안, 청구항 후보, 도면 설명서, 선행기술 대비표</strong>를 완벽한 문서 규격으로 추출합니다. 말로만 존재하던 기술이 검토 가능한 비즈니스 자산으로 즉시 변환됩니다.
+                    </p>
+                    <div class="flex gap-2 flex-wrap">
+                        <span class="px-3 py-1 bg-white/5 rounded text-sm text-grayMid">#AI_명세서_자동화</span>
+                        <span class="px-3 py-1 bg-white/5 rounded text-sm text-grayMid">#청구항_알고리즘</span>
+                        <span class="px-3 py-1 bg-white/5 rounded text-sm text-grayMid">#선행기술_대비표</span>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2 relative rounded-2xl overflow-hidden h-[400px]">
+                    <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="AI Drafting" class="object-cover w-full h-full opacity-60">
+                    <div class="absolute inset-0 bg-gradient-to-r from-background to-transparent"></div>
+                    <!-- UI Overlay -->
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[80%] bg-background/90 backdrop-blur border border-primary/40 rounded-lg p-6 shadow-[0_0_30px_rgba(0,240,255,0.15)]">
+                        <div class="flex items-center gap-2 mb-4 border-b border-white/10 pb-2">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span class="text-sm font-semibold text-textMain">Document Generator</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="h-2 w-full bg-white/10 rounded overflow-hidden"><div class="h-full bg-primary w-full animate-[pulse_2s_ease-in-out_infinite]"></div></div>
+                            <div class="h-2 w-3/4 bg-white/10 rounded"></div>
+                            <div class="h-2 w-5/6 bg-white/10 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 02 -->
+            <div id="feature2" class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="relative rounded-2xl overflow-hidden h-[400px]">
+                    <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Attorney Review" class="object-cover w-full h-full opacity-60">
+                    <div class="absolute inset-0 bg-secondary/10 mix-blend-overlay"></div>
+                    <div class="absolute inset-0 bg-gradient-to-l from-background to-transparent"></div>
+                    <!-- UI Overlay -->
+                    <div class="absolute bottom-8 left-8 w-[80%] bg-card/95 backdrop-blur border border-secondary/40 rounded-lg p-5 shadow-[0_0_30px_rgba(157,0,255,0.2)]">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-secondary/30 flex items-center justify-center shrink-0">
+                                <span class="text-secondary text-xs font-bold">K.P.A</span>
+                            </div>
+                            <div>
+                                <div class="text-xs text-secondary font-semibold mb-1">담당 변리사 코멘트</div>
+                                <p class="text-sm text-textMain leading-snug">"청구항 1의 권리범위가 다소 좁게 설정되었습니다. 해당 구성요소를 상위 개념으로 치환하여 회피 설계를 방지하도록 수정 제안드립니다."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-xs font-bold tracking-widest text-secondary border border-secondary/30 px-3 py-1 rounded-full mb-4 inline-block">[ ELITE HUMAN IN THE LOOP ]</span>
+                    <h3 class="text-secondary font-medium mt-2">변리사 검토 & 출원 연계</h3>
+                    <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-6 leading-tight">“가장 확실한 권리 범위를 구축하는<br>완벽한 법적 파트너십”</h2>
+                    <p class="text-grayMid leading-relaxed mb-6">
+                        AI가 생성한 고도화된 초안을 기반으로, 엄선된 특허 파트너 변리사가 1:1 매칭됩니다. 
+                        <strong class="text-textMain">출원 가능성 정밀 분석, 권리 범위 극대화 전략, 선행기술 회피 설계</strong> 등 전문적이고 고차원적인 자문을 안전하게 제공받으세요. 불필요한 거절 리스크를 완전히 제거하고, 가장 정교한 권리 장벽을 형성합니다.
+                    </p>
+                    <p class="text-xs text-grayMid/70 italic mb-8">
+                        (※ 플랫폼은 특허대리 업무를 직접 수행하지 않으며, 안전한 가이드라인 내에서 전문 변리사와의 직접 계약을 연계합니다.)
+                    </p>
+                    <div class="flex gap-2 flex-wrap">
+                        <span class="px-3 py-1 bg-white/5 rounded text-sm text-grayMid">#파트너_변리사_매칭</span>
+                        <span class="px-3 py-1 bg-white/5 rounded text-sm text-grayMid">#권리범위_최적화</span>
+                        <span class="px-3 py-1 bg-white/5 rounded text-sm text-grayMid">#출원_성공률_극대화</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature 03 -->
+            <div id="feature3" class="flex flex-col items-center text-center">
+                <span class="text-xs font-bold tracking-widest text-textMain border border-white/20 px-3 py-1 rounded-full mb-4 inline-block bg-white/5">[ ASSET FLOW ENGINE ]</span>
+                <h3 class="text-grayMid font-medium mt-2">IP 사업화 마켓플레이스</h3>
+                <h2 class="text-3xl md:text-4xl font-bold mt-2 mb-6 leading-tight">“장롱 속 특허가 아닌,<br>매일 현금 흐름을 만드는 비즈니스 자산으로.”</h2>
+                <p class="text-grayMid leading-relaxed max-w-3xl mb-12">
+                    특허 출원 준비와 동시에 비즈니스 확장 준비가 끝납니다. 작성된 IP 명세서를 기반으로 <strong class="text-textMain">기술소개서(SMK), 크라우드 펀딩 등록 자료, 사업화 제안서</strong>가 즉시 생성됩니다. 제조사, 유통사, 글로벌 투자 기업이 상시 참여하는 IP Forge 비드(Bid) 마켓에 등록되어 라이선스 계약, IP 매각, 투자 유치 기회를 실시간으로 확보하세요.
+                </p>
+
+                <!-- Dashboard Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
+                    <div class="feature-card p-6 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all"></div>
+                        <h4 class="text-lg font-bold text-primary mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            IP 요약서 자동 생성
+                        </h4>
+                        <p class="text-sm text-grayMid mb-4">투자자와 바이어를 설득하기 위한 최적의 기술 요약서(SMK)를 원클릭으로 패키징합니다.</p>
+                        <div class="h-1 w-full bg-white/5 rounded"><div class="h-full bg-primary w-full rounded"></div></div>
+                    </div>
+                    <div class="feature-card p-6 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-3xl group-hover:bg-secondary/20 transition-all"></div>
+                        <h4 class="text-lg font-bold text-secondary mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            크라우드 펀딩 연계
+                        </h4>
+                        <p class="text-sm text-grayMid mb-4">기술을 제품화하기 위한 펀딩 스토리라인을 구성하고, 제휴 플랫폼으로 즉시 전송합니다.</p>
+                        <div class="h-1 w-full bg-white/5 rounded"><div class="h-full bg-secondary w-full rounded"></div></div>
+                    </div>
+                    <div class="feature-card p-6 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-all"></div>
+                        <h4 class="text-lg font-bold text-textMain mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                            라이선싱 입찰 현황
+                        </h4>
+                        <p class="text-sm text-grayMid mb-4">마켓에 등록된 귀하의 기술에 대한 제조사 및 투자자의 비딩(Bid) 현황을 실시간 모니터링합니다.</p>
+                        <div class="h-1 w-full bg-white/5 rounded"><div class="h-full bg-textMain w-full rounded"></div></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 4. TARGET AUDIENCE MESSAGE -->
+    <section class="py-24 bg-[#0a0a0e] border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16">
+                아이디어를 비즈니스로 바꾸고 싶은 모든 이들을 위해
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 01 -->
+                <div class="target-card p-8 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="text-sm font-bold text-grayMid mb-4 border-b border-white/10 pb-2 inline-block">개인 발명가 & 예비 창업자</div>
+                        <h3 class="text-xl font-bold text-textMain mb-4 leading-snug">“아이디어는 훌륭한데,<br>어떻게 권리화할지 막막하신가요?”</h3>
+                        <p class="text-grayMid text-sm leading-relaxed">
+                            특허 사무소 문턱을 넘기 전에 좌절하지 마세요. AI 비서를 통해 전문 명세서 수준의 기초 문서를 무료로 설계하고, 완벽한 무기를 갖춘 상태에서 변리사 상담을 시작할 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 02 -->
+                <div class="target-card p-8 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="text-sm font-bold text-grayMid mb-4 border-b border-white/10 pb-2 inline-block">스타트업 & 벤처기업</div>
+                        <h3 class="text-xl font-bold text-textMain mb-4 leading-snug">“기술 장벽 구축과 투자 유치 자료,<br>동시에 준비하세요.”</h3>
+                        <p class="text-grayMid text-sm leading-relaxed">
+                            속도가 생명인 스타트업을 위해 특허 출원과 동시에 크라우드 펀딩용 스토리라인과 IR 기술 요약서(SMK)를 한 번에 추출합니다. 리소스 낭비 없이 기술 가치를 증명하세요.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 03 -->
+                <div class="target-card p-8 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="text-sm font-bold text-grayMid mb-4 border-b border-white/10 pb-2 inline-block">중소기업 & 특허 보유 기업</div>
+                        <h3 class="text-xl font-bold text-textMain mb-4 leading-snug">“잠자는 특허 자산을 깨워<br>새로운 현금 흐름을 창출하세요.”</h3>
+                        <p class="text-grayMid text-sm leading-relaxed">
+                            등록만 해두고 활용하지 못한 기술이 있다면 IP Forge 마켓에 노출시키세요. 대기업 및 파트너 제조사 매칭을 통해 라이선스 수수료와 매각 수익을 만들어 드립니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. CALL TO ACTION -->
+    <section class="py-32 cta-bg relative overflow-hidden">
+        <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+            <h2 class="text-4xl md:text-5xl font-black mb-6 leading-tight">
+                아이디어의 가치는<br>실행하고 권리화했을 때 증명됩니다.
+            </h2>
+            <p class="text-xl text-grayMid mb-12">
+                지금, 귀하의 비즈니스를 단단하게 단조하세요.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <button class="btn-cta px-10 py-5 rounded-full text-lg w-full sm:w-auto">
+                    지금 무료로 AI 초안 작성하기 ⚡
+                </button>
+                <button class="btn-secondary px-8 py-5 rounded-full text-lg w-full sm:w-auto group">
+                    파트너십 변리사 및 제휴사 등록하기 <span class="group-hover:translate-x-1 inline-block transition-transform">→</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. FOOTER -->
+    <footer class="bg-[#050508] border-t border-white/5 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-start gap-10 mb-12">
+                <div class="flex-1">
+                    <div class="text-xl font-black tracking-tighter mb-4 text-white">IP FORGE</div>
+                    <div class="text-xs text-grayMid space-y-2 leading-relaxed">
+                        <p><strong class="text-white/80">Company Name:</strong> (주)아이피포지 코리아 (IP FORGE Korea Co., Ltd.)</p>
+                        <p><strong class="text-white/80">Information:</strong> 대표자: 홍길동 | 사업자등록번호: 000-00-00000<br>서울시 강남구 테헤란로 AI 밸리 타워 18층</p>
+                    </div>
+                </div>
+                <div class="flex-1 max-w-2xl">
+                    <h5 class="text-sm font-bold text-white/80 mb-3">Legal Disclaimer (중요 법적 고지)</h5>
+                    <p class="text-[11px] text-grayMid/70 leading-relaxed text-justify">
+                        IP FORGE는 특허법 및 변리사법을 엄격히 준수합니다. 본 플랫폼은 인공지능 기술을 활용한 IP 문서 작성 보조 도구 및 사업화 제안 자료 자동 생성 솔루션을 제공하며, 특허출원의 대리 행위를 직접 수행하지 않습니다. 모든 공식적인 출원 대리 및 법적 자문 계약은 플랫폼과 제휴된 정식 등록 전문 변리사를 통해 독립적으로 이루어집니다.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/10 text-xs text-grayMid gap-4">
+                <div class="flex gap-4">
+                    <a href="#" class="hover:text-white transition-colors">서비스 이용약관</a>
+                    <a href="#" class="hover:text-white transition-colors font-bold">개인정보처리방침</a>
+                    <a href="#" class="hover:text-white transition-colors">변리사 파트너 제휴 약관</a>
+                    <a href="#" class="hover:text-white transition-colors">고객센터</a>
+                </div>
+                <div>
+                    &copy; 2026 IP FORGE. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        const btn = document.getElementById('mobileMenuBtn');
+        const menu = document.getElementById('mobileMenu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
